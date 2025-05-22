@@ -1,0 +1,84 @@
+h1 {
+    color: #ffefe6;
+    background-color: #e65c00;
+    padding: 5px 10px;
+    border-radius: 15px;
+    text-align: center;
+}
+
+a {
+    display: inline-block;
+    padding: 7px 10px;
+    margin: 5px 0;
+    text-decoration: none;
+    color: white;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: url("1.cur"), auto;
+}
+
+.btn-tables {
+    background-color: #007BFF;
+    }
+
+.btn-add {
+    background-color: #28a745;
+}
+
+.btn-del {
+    background-color: #dc3545;
+}
+
+.btn-report {
+    background-color: #6f42c1;
+}
+
+h3 {
+    display: inline-block;
+    color: #000000;
+    background-color: #ffe600;
+    padding: 5px 10px;
+    border-radius: 10px;
+    border: #000000;
+    border-style: double;
+}
+
+.table {
+    border-color: #007BFF;
+}
+
+.table_ot {
+    border-color: #973fe9;
+}
+
+.label {
+    display: inline-block;
+    width: 150px;
+    font-weight: bold;
+    color: #029624;
+    text-align: center;
+}
+
+.label_del {
+    display: inline-block;
+    width: 150px;
+    font-weight: bold;
+    color: #bb0000;
+    text-align: center;
+}
+
+.area {
+    width: 200px; 
+    padding: 5px;
+    margin-bottom: 7px;
+}
+
+.btn_dob {
+    width: 100px;
+    height: 40px;
+    color: #ffffff;
+    font-weight: bold;
+    background-color: #e65c00;
+    border: #e65c00;
+    border-radius: 20px;
+}
