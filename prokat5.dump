@@ -1,0 +1,619 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 14.15
+-- Dumped by pg_dump version 14.15
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- Name: prokat_avtomobilej; Type: DATABASE; Schema: -; Owner: postgres
+--
+
+CREATE DATABASE prokat_avtomobilej WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE = 'ru_RU.UTF-8';
+
+
+ALTER DATABASE prokat_avtomobilej OWNER TO postgres;
+
+\connect prokat_avtomobilej
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- Name: show_avto(); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.show_avto() RETURNS TABLE(marka text, model text, god_vypuska text, moschnost text, stoimost_za_chas text, gos_nomer text)
+    LANGUAGE sql
+    AS $$
+select avtomobili.marka, avtomobili.model, avtomobili.god_vypuska, avtomobili.moschnost, avtomobili.stoimost_za_chas, avtomobili.gos_nomer
+	from avtomobili
+$$;
+
+
+ALTER FUNCTION public.show_avto() OWNER TO postgres;
+
+--
+-- Name: show_kli(); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.show_kli() RETURNS TABLE(fio text, nomer_telefona text, pasport text)
+    LANGUAGE sql
+    AS $$
+select klienty.fio, klienty.nomer_telefona, klienty.pasport
+	from klienty
+$$;
+
+
+ALTER FUNCTION public.show_kli() OWNER TO postgres;
+
+--
+-- Name: show_nesh_sit(); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.show_nesh_sit() RETURNS TABLE(id_zakaza integer, opisanie text, summa_shtrafa text)
+    LANGUAGE sql
+    AS $$
+select neshtatnye_situacii.id_zakaza, neshtatnye_situacii.opisanie, neshtatnye_situacii.summa_shtrafa
+	from neshtatnye_situacii
+$$;
+
+
+ALTER FUNCTION public.show_nesh_sit() OWNER TO postgres;
+
+--
+-- Name: show_otchet(date, date); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.show_otchet(data1 date, data2 date) RETURNS TABLE(marka text, gos_nomer text, fio text, data date, data_vozvrata date, status text, data_vozvrata_po_factu date)
+    LANGUAGE sql
+    AS $$
+select avtomobili.marka, avtomobili.gos_nomer, klienty.fio, zakazy.data, zakazy.data_vozvrata, zakazy.status, zakazy.data_vozvrata_po_factu 
+                    from zakazy
+                    inner join avtomobili on zakazy.id_avto = avtomobili.id
+                    inner join klienty on zakazy.id_klienta = klienty.id
+                    where zakazy.data between data1 and data2
+                    order by zakazy.data;
+$$;
+
+
+ALTER FUNCTION public.show_otchet(data1 date, data2 date) OWNER TO postgres;
+
+--
+-- Name: show_zakazy(); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.show_zakazy() RETURNS TABLE(nomer_zakaza integer, marka text, gos_nomer text, fio text, data date, data_vozvrata date, status text, data_vozvrata_po_factu date)
+    LANGUAGE sql
+    AS $$
+select zakazy.nomer_zakaza, avtomobili.marka, avtomobili.gos_nomer, klienty.fio, zakazy.data, zakazy.data_vozvrata, zakazy.status, zakazy.data_vozvrata_po_factu
+		from zakazy
+		inner join avtomobili  on zakazy.id_avto = avtomobili.id
+		inner join klienty  on zakazy.id_klienta = klienty.id;
+$$;
+
+
+ALTER FUNCTION public.show_zakazy() OWNER TO postgres;
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- Name: avtomobili; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.avtomobili (
+    id bigint NOT NULL,
+    marka text,
+    model text,
+    god_vypuska text,
+    moschnost text,
+    stoimost_za_chas text,
+    gos_nomer text
+);
+
+
+ALTER TABLE public.avtomobili OWNER TO postgres;
+
+--
+-- Name: avtomobili_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.avtomobili_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.avtomobili_id_seq OWNER TO postgres;
+
+--
+-- Name: avtomobili_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.avtomobili_id_seq OWNED BY public.avtomobili.id;
+
+
+--
+-- Name: klienty; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.klienty (
+    id bigint NOT NULL,
+    fio text,
+    nomer_telefona text,
+    pasport text
+);
+
+
+ALTER TABLE public.klienty OWNER TO postgres;
+
+--
+-- Name: klienty_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.klienty_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.klienty_id_seq OWNER TO postgres;
+
+--
+-- Name: klienty_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.klienty_id_seq OWNED BY public.klienty.id;
+
+
+--
+-- Name: neshtatnye_situacii; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.neshtatnye_situacii (
+    id integer NOT NULL,
+    id_zakaza integer,
+    opisanie text,
+    summa_shtrafa text
+);
+
+
+ALTER TABLE public.neshtatnye_situacii OWNER TO postgres;
+
+--
+-- Name: neshtatnye_situacii_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.neshtatnye_situacii_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.neshtatnye_situacii_id_seq OWNER TO postgres;
+
+--
+-- Name: neshtatnye_situacii_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.neshtatnye_situacii_id_seq OWNED BY public.neshtatnye_situacii.id;
+
+
+--
+-- Name: polzovateli; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.polzovateli (
+    id integer NOT NULL,
+    login text,
+    parol text,
+    yr_dopyska text
+);
+
+
+ALTER TABLE public.polzovateli OWNER TO postgres;
+
+--
+-- Name: polzovateli_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.polzovateli_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.polzovateli_id_seq OWNER TO postgres;
+
+--
+-- Name: polzovateli_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.polzovateli_id_seq OWNED BY public.polzovateli.id;
+
+
+--
+-- Name: sessii; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.sessii (
+    id integer NOT NULL,
+    id_polz integer
+);
+
+
+ALTER TABLE public.sessii OWNER TO postgres;
+
+--
+-- Name: sessii_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.sessii_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.sessii_id_seq OWNER TO postgres;
+
+--
+-- Name: sessii_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.sessii_id_seq OWNED BY public.sessii.id;
+
+
+--
+-- Name: zakazy; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.zakazy (
+    id integer NOT NULL,
+    id_avto integer,
+    id_klienta integer,
+    data date,
+    data_vozvrata date,
+    status text,
+    data_vozvrata_po_factu date,
+    nomer_zakaza integer NOT NULL
+);
+
+
+ALTER TABLE public.zakazy OWNER TO postgres;
+
+--
+-- Name: zakazy_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.zakazy_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.zakazy_id_seq OWNER TO postgres;
+
+--
+-- Name: zakazy_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.zakazy_id_seq OWNED BY public.zakazy.id;
+
+
+--
+-- Name: zakazy_nomer_zakaza_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.zakazy_nomer_zakaza_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.zakazy_nomer_zakaza_seq OWNER TO postgres;
+
+--
+-- Name: zakazy_nomer_zakaza_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.zakazy_nomer_zakaza_seq OWNED BY public.zakazy.nomer_zakaza;
+
+
+--
+-- Name: avtomobili id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.avtomobili ALTER COLUMN id SET DEFAULT nextval('public.avtomobili_id_seq'::regclass);
+
+
+--
+-- Name: klienty id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.klienty ALTER COLUMN id SET DEFAULT nextval('public.klienty_id_seq'::regclass);
+
+
+--
+-- Name: neshtatnye_situacii id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.neshtatnye_situacii ALTER COLUMN id SET DEFAULT nextval('public.neshtatnye_situacii_id_seq'::regclass);
+
+
+--
+-- Name: polzovateli id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.polzovateli ALTER COLUMN id SET DEFAULT nextval('public.polzovateli_id_seq'::regclass);
+
+
+--
+-- Name: sessii id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.sessii ALTER COLUMN id SET DEFAULT nextval('public.sessii_id_seq'::regclass);
+
+
+--
+-- Name: zakazy id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.zakazy ALTER COLUMN id SET DEFAULT nextval('public.zakazy_id_seq'::regclass);
+
+
+--
+-- Name: zakazy nomer_zakaza; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.zakazy ALTER COLUMN nomer_zakaza SET DEFAULT nextval('public.zakazy_nomer_zakaza_seq'::regclass);
+
+
+--
+-- Data for Name: avtomobili; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.avtomobili (id, marka, model, god_vypuska, moschnost, stoimost_za_chas, gos_nomer) FROM stdin;
+54	Daewoo	Nexia	2011	80	100	Р039УУ72
+2	Renault	Logan	2015	110	100	Т371ХР04
+45	Chevrolet	Camaro V	2010	312	210	А081КР87
+48	Toyota	Hilux	2021	166	250	Х786ТТ75
+50	Ford	Mustang	2015	305	1000	С256КТ71
+53	Ford	Focus	2011	100	200	А491СМ51
+1	Lada	XRay	2020	113	130	С070АА36
+\.
+
+
+--
+-- Data for Name: klienty; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.klienty (id, fio, nomer_telefona, pasport) FROM stdin;
+1	Иванов И.А	88005552525	1234086734
+2	Смирнов В.С	89124899370	8300373038
+3	Соболев К.К	89032895937	4407594750
+4	Ершова Е.Е	89107499647	2820826399
+5	Добрый Н.П	89012877461	0208118308
+8	Жабов С.И	89112847389	0283883028
+\.
+
+
+--
+-- Data for Name: neshtatnye_situacii; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.neshtatnye_situacii (id, id_zakaza, opisanie, summa_shtrafa) FROM stdin;
+2	1	авария	4000
+3	4	угон	40000
+4	2	штраф ГИБДД	4600
+\.
+
+
+--
+-- Data for Name: polzovateli; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.polzovateli (id, login, parol, yr_dopyska) FROM stdin;
+1	marina001	1234	admin
+2	ivan456	234	sotrudnik
+3	elena988	293	klient
+4	sanya111	88776	klient
+6	mila	0405	klient
+\.
+
+
+--
+-- Data for Name: sessii; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.sessii (id, id_polz) FROM stdin;
+\.
+
+
+--
+-- Data for Name: zakazy; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.zakazy (id, id_avto, id_klienta, data, data_vozvrata, status, data_vozvrata_po_factu, nomer_zakaza) FROM stdin;
+2	2	3	2025-03-30	2025-03-31	возвращена	2025-04-01	1
+3	50	4	2025-05-01	2025-05-03	возвращена	2025-05-02	2
+6	50	2	2025-03-01	2025-03-01	возвращена	2025-03-01	3
+4	54	2	2025-02-05	2025-02-05	у клиента	\N	4
+5	45	2	2025-05-12	2025-05-15	возвращена	2025-05-15	5
+1	1	1	2025-02-05	2025-02-05	у клиента	2025-02-07	6
+7	48	5	2025-09-29	2025-10-01	возвращена	2025-10-04	7
+\.
+
+
+--
+-- Name: avtomobili_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.avtomobili_id_seq', 54, true);
+
+
+--
+-- Name: klienty_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.klienty_id_seq', 8, true);
+
+
+--
+-- Name: neshtatnye_situacii_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.neshtatnye_situacii_id_seq', 4, true);
+
+
+--
+-- Name: polzovateli_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.polzovateli_id_seq', 6, true);
+
+
+--
+-- Name: sessii_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.sessii_id_seq', 1, false);
+
+
+--
+-- Name: zakazy_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.zakazy_id_seq', 7, true);
+
+
+--
+-- Name: zakazy_nomer_zakaza_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.zakazy_nomer_zakaza_seq', 7, true);
+
+
+--
+-- Name: avtomobili avtomobili_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.avtomobili
+    ADD CONSTRAINT avtomobili_pk PRIMARY KEY (id);
+
+
+--
+-- Name: klienty klienty_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.klienty
+    ADD CONSTRAINT klienty_pk PRIMARY KEY (id);
+
+
+--
+-- Name: neshtatnye_situacii neshtatnye_situacii_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.neshtatnye_situacii
+    ADD CONSTRAINT neshtatnye_situacii_pk PRIMARY KEY (id);
+
+
+--
+-- Name: polzovateli polzovateli_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.polzovateli
+    ADD CONSTRAINT polzovateli_pk PRIMARY KEY (id);
+
+
+--
+-- Name: sessii sessii_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.sessii
+    ADD CONSTRAINT sessii_pk PRIMARY KEY (id);
+
+
+--
+-- Name: zakazy zakazy_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.zakazy
+    ADD CONSTRAINT zakazy_pk PRIMARY KEY (id);
+
+
+--
+-- Name: neshtatnye_situacii neshtatnye_situacii_zakazy_fk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.neshtatnye_situacii
+    ADD CONSTRAINT neshtatnye_situacii_zakazy_fk FOREIGN KEY (id_zakaza) REFERENCES public.zakazy(id);
+
+
+--
+-- Name: sessii sessii_polzovateli_fk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.sessii
+    ADD CONSTRAINT sessii_polzovateli_fk FOREIGN KEY (id_polz) REFERENCES public.polzovateli(id);
+
+
+--
+-- Name: zakazy zakazy_avtomobili_fk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.zakazy
+    ADD CONSTRAINT zakazy_avtomobili_fk FOREIGN KEY (id_avto) REFERENCES public.avtomobili(id) ON DELETE SET NULL;
+
+
+--
+-- Name: zakazy zakazy_klienty_fk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.zakazy
+    ADD CONSTRAINT zakazy_klienty_fk FOREIGN KEY (id_klienta) REFERENCES public.klienty(id) ON DELETE SET NULL;
+
+
+--
+-- PostgreSQL database dump complete
+--
+

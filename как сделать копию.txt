@@ -1,0 +1,5 @@
+в cmd: 
+сделать копию: "C:\Program Files\PostgreSQL\17\bin\pg_dump.exe" -h localhost -U postgres -W -f "C:\xampp\htdocs\bd\prokat.dump" -d prokat_avtomobilej --create
+
+восстановить копию: psql -h localhost -U postgres -W -f "путь"
+
