@@ -1,0 +1,12 @@
+каталог: C:\xampp\htdocs\bd
+в браузере: http://localhost:8080/bd/main.php
+
+установить Apache как службу: 
+1) cd C:\xampp\apache\bin
+2) httpd -k start
+
+! если не запускается вместе с системой:
+1) Win+r
+2) services.msc
+3) найти Apache 2.4
+4) в свойствах Тип запуска: автоматически
